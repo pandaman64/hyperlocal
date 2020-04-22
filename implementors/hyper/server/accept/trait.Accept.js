@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["hyperlocal"] = [{"text":"impl <a class=\"trait\" href=\"https://docs.rs/hyper/0.13.5/hyper/server/accept/trait.Accept.html\" title=\"trait hyper::server::accept::Accept\">Accept</a> for <a class=\"struct\" href=\"hyperlocal/struct.SocketIncoming.html\" title=\"struct hyperlocal::SocketIncoming\">SocketIncoming</a>","synthetic":false,"types":["hyperlocal::server::conn::SocketIncoming"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
