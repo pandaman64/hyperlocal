@@ -30,13 +30,13 @@ mod client;
 #[cfg(feature = "client")]
 pub use client::{UnixClientExt, UnixConnector};
 
-#[cfg(feature = "server")]
-mod server;
-#[cfg(feature = "server")]
-pub use server::UnixServerExt;
+// #[cfg(feature = "server")]
+// mod server;
+// #[cfg(feature = "server")]
+// pub use server::bind_unix;
 
 mod uri;
 pub use uri::Uri;
 
-#[cfg(feature = "server")]
-pub use crate::server::conn::SocketIncoming;
+// #[cfg(feature = "server")]
+// pub use crate::server::conn::SocketIncoming;

@@ -1,3 +1,4 @@
+use async_std::io::{Read as _, Write as _};
 use futures_util::future::BoxFuture;
 use hex::FromHex;
 use hyper::{
@@ -18,7 +19,7 @@ use tokio::io::ReadBuf;
 #[derive(Debug)]
 pub struct UnixStream {
     #[pin]
-    unix_stream: tokio::net::UnixStream,
+    unix_stream: async_std::os::unix::net::UnixStream,
 }
 
 impl UnixStream {
@@ -26,7 +27,8 @@ impl UnixStream {
     where
         P: AsRef<Path>,
     {
-        let unix_stream = tokio::net::UnixStream::connect(path).await?;
+        let path = path.as_ref();
+        let unix_stream = async_std::os::unix::net::UnixStream::connect(path).await?;
         Ok(Self { unix_stream })
     }
 }
@@ -43,7 +45,7 @@ impl tokio::io::AsyncWrite for UnixStream {
         self.project().unix_stream.poll_flush(cx)
     }
     fn poll_shutdown(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Result<(), io::Error>> {
-        self.project().unix_stream.poll_shutdown(cx)
+        self.project().unix_stream.poll_close(cx)
     }
 }
 
@@ -53,7 +55,14 @@ impl tokio::io::AsyncRead for UnixStream {
         cx: &mut Context<'_>,
         buf: &mut ReadBuf<'_>,
     ) -> Poll<io::Result<()>> {
-        self.project().unix_stream.poll_read(cx, buf)
+        match self.project().unix_stream.poll_read(cx, buf.initialize_unfilled()) {
+            Poll::Pending => Poll::Pending,
+            Poll::Ready(Err(e)) => Poll::Ready(Err(e)),
+            Poll::Ready(Ok(n)) => {
+                buf.advance(n);
+                Poll::Ready(Ok(()))
+            }
+        }
     }
 }
 

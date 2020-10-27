@@ -3,11 +3,11 @@ use hyperlocal::{UnixClientExt, Uri};
 use std::error::Error;
 use tokio::io::{self, AsyncWriteExt as _};
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
-    let url = Uri::new("/tmp/hyperlocal.sock", "/").into();
+fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    async_std::task::block_on(async {
+        let url = Uri::new("/tmp/hyperlocal.sock", "/").into();
 
-    let client = Client::unix();
+        let client = Client::unix();
 
     let mut response = client.get(url).await?;
 
@@ -16,5 +16,6 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
         io::stdout().write_all(&chunk).await?;
     }
 
-    Ok(())
+        Ok(())
+    })
 }

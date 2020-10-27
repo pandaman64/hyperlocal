@@ -14,7 +14,8 @@ pub(crate) mod conn {
         pin::Pin,
         task::{Context, Poll},
     };
-    use tokio::net::{UnixListener, UnixStream};
+    use async_std::os::unix::net::{UnixListener, UnixStream};
+    // use tokio::net::{UnixListener, UnixStream};
 
     /// A stream of connections from binding to a socket.
     #[pin_project]
@@ -25,8 +26,9 @@ pub(crate) mod conn {
 
     impl SocketIncoming {
         /// Creates a new `SocketIncoming` binding to provided socket path.
-        pub fn bind(path: impl AsRef<Path>) -> Result<Self, std::io::Error> {
-            let listener = UnixListener::bind(path)?;
+        pub async fn bind(path: impl AsRef<Path>) -> Result<Self, std::io::Error> {
+            let path = path.as_ref();
+            let listener = UnixListener::bind(path).await?;
 
             Ok(Self { listener })
         }
@@ -62,6 +64,7 @@ pub(crate) mod conn {
     }
 }
 
+/*
 /// Extension trait for provisioning a hyper HTTP server over a Unix domain
 /// socket.
 ///
@@ -93,3 +96,4 @@ impl UnixServerExt for Server<SocketIncoming, ()> {
         Ok(Server::builder(incoming))
     }
 }
+*/
